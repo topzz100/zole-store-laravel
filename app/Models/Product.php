@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Produt extends Model
+class Product extends Model
 {
     /** @use HasFactory<\Database\Factories\ProdutFactory> */
     use HasFactory;
@@ -19,6 +19,7 @@ class Produt extends Model
         'price',
         'tags',
         'images',
+        'gender',
         'is_sold',  // added
     ];
 
@@ -27,4 +28,8 @@ class Produt extends Model
         'images' => 'array',
         'is_sold' => 'boolean',
     ];
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }

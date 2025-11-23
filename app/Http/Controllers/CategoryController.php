@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Produt;
-use App\Http\Requests\StoreProdutRequest;
-use App\Http\Requests\UpdateProdutRequest;
+use App\Models\Category;
+use Illuminate\Http\Request;
+use App\Http\Resources\CategoryResource;
 
-class ProdutController extends Controller
+class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,12 +14,16 @@ class ProdutController extends Controller
     public function index()
     {
         //
+        $categories = Category::all();
+
+        //return response()->json($categories);
+        return CategoryResource::collection($categories)->response();
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreProdutRequest $request)
+    public function store(Request $request)
     {
         //
     }
@@ -27,7 +31,7 @@ class ProdutController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Produt $produt)
+    public function show(string $id)
     {
         //
     }
@@ -35,7 +39,7 @@ class ProdutController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProdutRequest $request, Produt $produt)
+    public function update(Request $request, string $id)
     {
         //
     }
@@ -43,7 +47,7 @@ class ProdutController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Produt $produt)
+    public function destroy(string $id)
     {
         //
     }
