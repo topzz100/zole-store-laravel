@@ -24,15 +24,29 @@ class StoreCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // name is required
-            'name' => 'required|string|max:255',
+            // 1. Name: Must be present, a string, and within the length limit.
+            //    If using composite key uniqueness, remove the unique rule here.
+            'name'        => 'required|string|max:255',
 
-            // slug is required, must be unique in the categories table
-            'slug' => 'required|string|unique:categories,slug|max:255',
+            // 2. Slug: The client does NOT send this, as the Model generates it. 
+            //    Therefore, we omit the slug rule entirely.
 
-            // parent_id is optional (top-level category), but if provided, must exist in the categories table
-            'parent_id' => 'nullable|integer|exists:categories,id',
+            // 3. Parent ID: Must be nullable (for top-level categories).
+            //    If provided, it MUST exist in the 'id' column of the 'categories' table.
+            'parent_id'   => 'nullable|integer|exists:categories,id',
+
+            // 4. Description: Optional field.
             'description' => 'nullable|string',
+        ];
+    }
+
+    /**
+     * Optional: Add custom messages for rules (e.g., better error message for exists).
+     */
+    public function messages(): array
+    {
+        return [
+            'parent_id.exists' => 'The selected parent category does not exist.'
         ];
     }
 }
