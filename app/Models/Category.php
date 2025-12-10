@@ -5,52 +5,60 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use RuntimeException; // Used for throwing a controlled error
 
 class Category extends Model
 {
-    //
     protected $fillable = ['name', 'slug', 'parent_id', 'description'];
 
-    // --- Accessor/Mutator Logic for Slug Generation ---
+    // --- Accessor/Mutator Logic for Strict Slug Generation ---
 
-    /**
-     * Defines the Mutator for the 'name' attribute.
-     * When the 'name' is set (during create or update), this function runs, 
-     * setting both the 'name' and automatically generating the unique 'slug'.
-     *
-     * @return Attribute
-     */
     protected function name(): Attribute
     {
         return Attribute::make(
             set: fn(string $value) => [
                 'name' => $value,
-                // Calls the helper function to generate and check for uniqueness
-                'slug' => $this->generateUniqueSlug($value),
+                // The setter calls the new strict check method
+                'slug' => $this->getStrictUniqueSlug($value),
             ],
         );
     }
 
     /**
-     * Helper method to ensure the generated slug is unique by appending a counter.
+     * Helper method to generate the slug and enforce strict uniqueness.
+     * Throws a RuntimeException with status code 409 if the base slug exists.
+     * * @throws \RuntimeException
      */
-    protected function generateUniqueSlug(string $name): string
+    protected function getStrictUniqueSlug(string $name): string
     {
         $baseSlug = Str::slug($name);
-        $slug = $baseSlug;
-        $count = 1;
 
-        // Loop until a unique slug is found
-        while (Category::where('slug', $slug)
-            // IMPORTANT: For updates, ignore the category being updated.
-            ->where('id', '!=', $this->id ?? 0)
-            ->exists()
-        ) {
-            $slug = $baseSlug . '-' . $count++;
+        // 1. Check if the generated base slug already exists in the database.
+        if ($this->slugExists($baseSlug)) {
+            // If it exists, throw a specific exception.
+            // We use 409 as the code to signal HTTP Conflict to the controller.
+            throw new RuntimeException(
+                "The category name '{$name}' conflicts with an existing slug: '{$baseSlug}'. Please choose a different name.",
+                409
+            );
         }
 
-        return $slug;
+        // 2. If it's unique, return the base slug without any counter.
+        return $baseSlug;
     }
+
+    /**
+     * Checks if a given slug already exists, ignoring the current category's ID during updates.
+     */
+    protected function slugExists(string $slug): bool
+    {
+        return Category::where('slug', $slug)
+            // Ignore the current record ID only if we are updating (this->id exists)
+            ->where('id', '!=', $this->id ?? 0)
+            ->exists();
+    }
+
+    // --- Relationships (Unchanged) ---
 
     public function parent()
     {

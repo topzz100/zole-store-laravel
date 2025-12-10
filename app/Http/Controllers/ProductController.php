@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use App\Http\Requests\StoreProductRequest;
-use App\Http\Requests\UpdateProductRequest;
+use App\Http\Requests\ProductRequest\StoreProductRequest;
+use App\Http\Requests\ProductRequest\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use Illuminate\Support\Facades\Log;
 
@@ -24,19 +24,7 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        //
-        // $validatedData = $request->validate([
-        //     'name'        => 'required|string|max:255',
-        //     'slug'        => 'nullable|string|unique:products,slug|max:255',
-        //     'description' => 'nullable|string',
-        //     'category_id' => 'required|integer|exists:categories,id',
-        //     'brand'       => 'nullable|string|max:100',
-        //     'price'       => 'required|numeric|min:0.01',
-        //     'tags'        => 'nullable|array',
-        //     'images'      => 'nullable|array',
-        //     'gender'      => 'nullable|string|in:male,female,unisex',
-        //     'is_sold'     => 'boolean',
-        // ]);
+
         $validatedData = $request->validated();
 
         // 2. Data Storage: Using the Product Model's create() method
@@ -47,7 +35,7 @@ class ProductController extends Controller
             // 3. Response: Return a success message and the created product
             return response()->json([
                 'message' => 'Product created successfully!',
-                'product' => $product,
+                'data' => new ProductResource($product),
             ], 201); // 201 Created status code
 
         } catch (\Exception $e) {
@@ -68,6 +56,7 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         //
+        return (new ProductResource($product))->response();
     }
 
     /**
@@ -76,6 +65,27 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, Product $product)
     {
         //
+        $validatedData = $request->validated();
+
+        // 2. Data Update: Use the Product Model's update() method
+        try {
+            // update() only uses the fields present in the $validatedData array
+            $product->update($validatedData);
+
+            // 3. Response: Return a success message and the updated product
+            return response()->json([
+                'message' => 'Product updated successfully!',
+                'data' => new ProductResource($product), // Return the refreshed product data
+            ]); // Default status code is 200 OK
+
+        } catch (\Exception $e) {
+            Log::error('Product update failed for ID ' . $product->id . ': ' . $e->getMessage());
+
+            return response()->json([
+                'message' => 'Failed to update product.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

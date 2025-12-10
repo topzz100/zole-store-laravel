@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreCategoryRequest;
-use App\Http\Requests\UpdateCategoryRequest;
+use App\Http\Requests\CategoryRequest\StoreCategoryRequest;
+use App\Http\Requests\CategoryRequest\UpdateCategoryRequest;
 use App\Models\Category;
-use Illuminate\Http\Request;
 use App\Http\Resources\CategoryResource;
 use Illuminate\Support\Facades\Log;
 
@@ -41,6 +40,13 @@ class CategoryController extends Controller
                 'data' => new CategoryResource($category)
             ], 201);
         } catch (\Exception $e) {
+
+            if ($e->getCode() === 409) {
+                return response()->json([
+                    'message' => $e->getMessage(),
+                    'error' => 'Conflict',
+                ], 409); // <-- Return 409 Conflict
+            }
             // Catch unexpected server/database errors (e.g., connection loss)
             Log::error('Category creation failed: ' . $e->getMessage());
 
@@ -80,6 +86,12 @@ class CategoryController extends Controller
                 'data' => new CategoryResource($category->fresh()) // Use fresh() to get the latest data
             ]);
         } catch (\Exception $e) {
+            if ($e->getCode() === 409) {
+                return response()->json([
+                    'message' => $e->getMessage(),
+                    'error' => 'Conflict',
+                ], 409); // <-- Return 409 Conflict
+            }
             Log::error('Category update failed: ' . $e->getMessage());
 
             return response()->json([
@@ -91,8 +103,25 @@ class CategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Category $category)
     {
-        //
+        try {
+            // 1. Delete the record
+            $category->delete();
+
+            // 2. Return success status
+            // 204 No Content is the standard HTTP status for a successful deletion
+            return response()->json([
+                'message' => 'Category deleted successfully.',
+
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Category deletion failed: ' . $e->getMessage());
+
+            // Return a generic 500 error response if the deletion fails unexpectedly
+            return response()->json([
+                'message' => 'Failed to delete category due to an internal server error.'
+            ], 500);
+        }
     }
 }
