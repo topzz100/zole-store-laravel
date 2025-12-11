@@ -91,8 +91,29 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    // public function destroy(Product $product)
+    // {
+    //     //
+    // }
     public function destroy(Product $product)
     {
-        //
+        try {
+            // 1. Delete the record
+            $product->delete();
+
+            // 2. Return success status
+            // 204 No Content is the standard HTTP status for a successful deletion
+            return response()->json([
+                'message' => 'Product deleted successfully.',
+
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Product deletion failed: ' . $e->getMessage());
+
+            // Return a generic 500 error response if the deletion fails unexpectedly
+            return response()->json([
+                'message' => 'Failed to delete product due to an internal server error.'
+            ], 500);
+        }
     }
 }
