@@ -19,7 +19,6 @@ class ProductVariantController extends Controller
      */
     public function index(Product $product): JsonResponse
     {
-        //
         $variants = $product->variants;
 
         // 2. Return the collection using the resource for standardized formatting (HTTP 200 OK).
