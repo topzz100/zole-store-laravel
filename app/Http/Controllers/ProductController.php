@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use Illuminate\Http\Request;
 use App\Http\Requests\ProductRequest\StoreProductRequest;
 use App\Http\Requests\ProductRequest\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
@@ -13,10 +14,46 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        return ProductResource::collection(Product::all());
+        $query = Product::query();
+
+        if ($request->filled('tag')) {
+            $tags = array_map('trim', explode(',', $request->tag));
+            $query->withTags($tags);
+        }
+        if ($request->filled('tag')) {
+            $tags = array_map('trim', explode(',', $request->tag));
+            $query->withTags($tags);
+        }
+
+        if ($request->filled('tag')) {
+            $tags = array_map('trim', explode(',', $request->tag));
+            $query->withTags($tags);
+        }
+        if ($request->filled('tag')) {
+            $tags = array_map('trim', explode(',', $request->tag));
+            $query->withTags($tags);
+        }
+        if ($request->filled('tag')) {
+            $tags = array_map('trim', explode(',', $request->tag));
+            $query->withTags($tags);
+        }
+        if ($request->filled('tag')) {
+            $tags = array_map('trim', explode(',', $request->tag));
+            $query->withTags($tags);
+        }
+        if ($request->filled('tag')) {
+            $tags = array_map('trim', explode(',', $request->tag));
+            $query->withTags($tags);
+        }
+        if ($request->filled('tag')) {
+            $tags = array_map('trim', explode(',', $request->tag));
+            $query->withTags($tags);
+        }
+        return ProductResource::collection(
+            $query->latest()->get()
+        );
     }
 
     /**
@@ -55,7 +92,9 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        //
+        // Eager load variants to include them in the response
+        $product->load('variants');
+
         return (new ProductResource($product))->response();
     }
 

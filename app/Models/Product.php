@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class Product extends Model
@@ -63,8 +64,25 @@ class Product extends Model
         return $slug;
     }
 
+    public function scopeWithTags($query, array $tags)
+    {
+        return $query->where(function ($q) use ($tags) {
+            foreach ($tags as $tag) {
+                $q->orWhereJsonContains('tags', $tag);
+            }
+        });
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * A Product has many ProductVariants.
+     */
+    public function variants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class, 'product_id');
     }
 }

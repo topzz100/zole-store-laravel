@@ -21,6 +21,11 @@ class ProductVariantController extends Controller
     {
         $variants = $product->variants;
 
+        // Ensure we have a collection (even if empty) to avoid null errors
+        if ($variants === null) {
+            $variants = collect();
+        }
+
         // 2. Return the collection using the resource for standardized formatting (HTTP 200 OK).
         return ProductVariantResource::collection($variants)->response();
     }
