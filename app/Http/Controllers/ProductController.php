@@ -22,35 +22,7 @@ class ProductController extends Controller
             $tags = array_map('trim', explode(',', $request->tag));
             $query->withTags($tags);
         }
-        if ($request->filled('tag')) {
-            $tags = array_map('trim', explode(',', $request->tag));
-            $query->withTags($tags);
-        }
 
-        if ($request->filled('tag')) {
-            $tags = array_map('trim', explode(',', $request->tag));
-            $query->withTags($tags);
-        }
-        if ($request->filled('tag')) {
-            $tags = array_map('trim', explode(',', $request->tag));
-            $query->withTags($tags);
-        }
-        if ($request->filled('tag')) {
-            $tags = array_map('trim', explode(',', $request->tag));
-            $query->withTags($tags);
-        }
-        if ($request->filled('tag')) {
-            $tags = array_map('trim', explode(',', $request->tag));
-            $query->withTags($tags);
-        }
-        if ($request->filled('tag')) {
-            $tags = array_map('trim', explode(',', $request->tag));
-            $query->withTags($tags);
-        }
-        if ($request->filled('tag')) {
-            $tags = array_map('trim', explode(',', $request->tag));
-            $query->withTags($tags);
-        }
         return ProductResource::collection(
             $query->latest()->get()
         );

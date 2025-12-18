@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductVariantController;
@@ -10,9 +11,26 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
-Route::apiResource('products', ProductController::class);
-Route::apiResource('products.variants', ProductVariantController::class)->shallow();
-Route::apiResource('categories', CategoryController::class);
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+// Public read-only endpoints (no authentication required)
+Route::apiResource('products', ProductController::class)->only(['index', 'show']);
+Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
+Route::apiResource('products.variants', ProductVariantController::class)
+    ->only(['index', 'show'])
+    ->shallow();
+
+// Protected endpoints (create / update / delete require auth)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::apiResource('products', ProductController::class)->except(['index', 'show']);
+    Route::apiResource('categories', CategoryController::class)->except(['index', 'show']);
+    Route::apiResource('products.variants', ProductVariantController::class)
+        ->except(['index', 'show'])
+        ->shallow();
+});
 
 Route::get('v1/test', function () {
     return response()->json(['message' => 'API working']);
