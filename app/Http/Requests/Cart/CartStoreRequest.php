@@ -11,7 +11,7 @@ class CartStoreRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true; // Authorization is handled by auth:sanctum middleware
     }
 
     /**
@@ -20,11 +20,11 @@ class CartStoreRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    { {
-            return [
-                'product_variant_id' => ['required', 'exists:product_variants,id'],
-                'quantity' => ['required', 'integer', 'min:1'],
-            ];
-        }
+    {
+        return [
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.product_variant_id' => ['required', 'exists:product_variants,id'],
+            'items.*.quantity' => ['required', 'integer', 'min:1'],
+        ];
     }
 }
