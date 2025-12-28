@@ -20,6 +20,13 @@ class AddressController extends Controller
     }
 
 
+    public function show(Address $address)
+    {
+        // Eager load variants to include them in the response
+        // $product->load('variants');
+        return (new AddressResource($address))->response();
+    }
+
     public function store(StoreAddressRequest $request)
     {
         $validatedData = $request->validated();

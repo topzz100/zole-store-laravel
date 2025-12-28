@@ -50,6 +50,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //addresses
     Route::get('/addresses', [AddressController::class, 'index']);
+    Route::get('/addresses/{address}', [AddressController::class, 'show']);
     Route::post('/addresses', [AddressController::class, 'store']);
     Route::put('/addresses/{address}', [AddressController::class, 'update']);
     Route::delete('/addresses/{address}', [AddressController::class, 'destroy']);
